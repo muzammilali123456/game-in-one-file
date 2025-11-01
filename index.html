@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tic Tac Toe - Multiplayer</title>
+    <title>Tic Tac Toe Author (syed muzammil ali)</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -41,7 +41,7 @@
 
             <div class="game-mode">
                 <button class="mode-btn active" onclick="setGameMode('local')">
-                    🎮 Local Multiplayer
+                    🎮 Multiplayer
                 </button>
                 <button class="mode-btn" onclick="setGameMode('ai')">
                     🤖 vs AI
@@ -90,7 +90,10 @@
                         <span id="currentPlayerName">Player 1</span>'s turn (X)
                     </div>
 
-                    <div class="board" id="gameBoard">
+                    <div class="board-container">
+                        <div class="board" id="gameBoard">
+                        </div>
+                        <div class="win-line" id="winLine"></div>
                     </div>
 
                     <div style="text-align: center; margin-top: 30px;">
@@ -172,7 +175,7 @@
             <div class="winner-symbol" id="winnerSymbol">🎉</div>
             <p id="winnerMessage" style="font-size: 1.2rem; margin-bottom: 30px;"></p>
             <div style="display: flex; gap: 15px; justify-content: center;">
-                <button class="btn btn-primary" onclick="resetGame()">
+                <button class="btn btn-primary" onclick="playAgain()">
                     <span>🔄</span> Play Again
                 </button>
                 <button class="btn btn-secondary" onclick="showLobby()">

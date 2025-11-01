@@ -14,7 +14,8 @@ let gameState = {
         total: 0
     },
     gameActive: true,
-    chatMessages: []
+    chatMessages: [],
+    winningLine: null
 };
 
 const lobby = document.getElementById('lobby');
@@ -23,6 +24,7 @@ const scoreboard = document.getElementById('scoreboard');
 const gameBoard = document.getElementById('gameBoard');
 const winnerModal = document.getElementById('winnerModal');
 const aiDifficulty = document.getElementById('aiDifficulty');
+const winLine = document.getElementById('winLine');
 
 function initGame() {
     createBoard();
@@ -59,8 +61,9 @@ function makeMove(index) {
     gameState.board[index] = gameState.currentPlayer;
     updateBoard();
     
-    if (checkWinner()) {
-        endGame(gameState.currentPlayer);
+    const winner = checkWinner();
+    if (winner) {
+        endGame(winner.player, winner.line);
     } else if (gameState.board.every(cell => cell !== '')) {
         endGame('draw');
     } else {
@@ -222,20 +225,81 @@ function checkGameResult(board) {
 
 function checkWinner() {
     const winPatterns = [
-        [0, 1, 2], [3, 4, 5], [6, 7, 8],
-        [0, 3, 6], [1, 4, 7], [2, 5, 8],
-        [0, 4, 8], [2, 4, 6]
+        { pattern: [0, 1, 2], type: 'horizontal', position: 'top' },
+        { pattern: [3, 4, 5], type: 'horizontal', position: 'middle' },
+        { pattern: [6, 7, 8], type: 'horizontal', position: 'bottom' },
+        { pattern: [0, 3, 6], type: 'vertical', position: 'left' },
+        { pattern: [1, 4, 7], type: 'vertical', position: 'center' },
+        { pattern: [2, 5, 8], type: 'vertical', position: 'right' },
+        { pattern: [0, 4, 8], type: 'diagonal', position: 'top-left' },
+        { pattern: [2, 4, 6], type: 'diagonal', position: 'top-right' }
     ];
 
-    return winPatterns.some(pattern => {
-        const [a, b, c] = pattern;
-        return gameState.board[a] !== '' && 
-               gameState.board[a] === gameState.board[b] && 
-               gameState.board[a] === gameState.board[c];
-    });
+    for (const winPattern of winPatterns) {
+        const [a, b, c] = winPattern.pattern;
+        if (gameState.board[a] !== '' && 
+            gameState.board[a] === gameState.board[b] && 
+            gameState.board[a] === gameState.board[c]) {
+            return {
+                player: gameState.board[a],
+                line: winPattern
+            };
+        }
+    }
+    return null;
 }
 
-function endGame(winner) {
+function drawWinningLine(line) {
+    const boardRect = gameBoard.getBoundingClientRect();
+    const cellSize = boardRect.width / 3;
+    const gap = 15;
+    
+    winLine.className = 'win-line show';
+    
+    switch (line.type) {
+        case 'horizontal':
+            const horizontalPositions = {
+                'top': cellSize / 2,
+                'middle': cellSize * 1.5,
+                'bottom': cellSize * 2.5
+            };
+            winLine.style.width = `${boardRect.width - gap}px`;
+            winLine.style.height = '8px';
+            winLine.style.top = `${horizontalPositions[line.position] - 4}px`;
+            winLine.style.left = `${gap / 2}px`;
+            break;
+            
+        case 'vertical':
+            const verticalPositions = {
+                'left': cellSize / 2,
+                'center': cellSize * 1.5,
+                'right': cellSize * 2.5
+            };
+            winLine.style.width = '8px';
+            winLine.style.height = `${boardRect.height - gap}px`;
+            winLine.style.left = `${verticalPositions[line.position] - 4}px`;
+            winLine.style.top = `${gap / 2}px`;
+            break;
+            
+        case 'diagonal':
+            if (line.position === 'top-left') {
+                winLine.style.width = `${Math.sqrt(2) * (boardRect.width - gap)}px`;
+                winLine.style.height = '8px';
+                winLine.style.top = `${boardRect.height / 2 - 4}px`;
+                winLine.style.left = `${gap / 2}px`;
+                winLine.style.transform = 'rotate(45deg)';
+            } else {
+                winLine.style.width = `${Math.sqrt(2) * (boardRect.width - gap)}px`;
+                winLine.style.height = '8px';
+                winLine.style.top = `${boardRect.height / 2 - 4}px`;
+                winLine.style.right = `${gap / 2}px`;
+                winLine.style.transform = 'rotate(-45deg)';
+            }
+            break;
+    }
+}
+
+function endGame(winner, winningLine) {
     gameState.gameActive = false;
     gameState.scores.total++;
     
@@ -247,17 +311,21 @@ function endGame(winner) {
         const winnerName = gameState.players[winner];
         showWinnerModal(`${winnerName} Wins!`, winner === 'X' ? '❌' : '⭕', `Congratulations ${winnerName}!`);
         
-        highlightWinningCells();
+        if (winningLine) {
+            drawWinningLine(winningLine);
+            highlightWinningCells(winningLine.pattern);
+        }
     }
     
     updateStats();
     saveToLocalStorage();
 }
 
-function highlightWinningCells() {
+function highlightWinningCells(winningPattern) {
     setTimeout(() => {
-        document.querySelectorAll('.cell').forEach(cell => {
-            if (cell.textContent !== '') {
+        winningPattern.forEach(index => {
+            const cell = document.querySelector(`.cell[data-index="${index}"]`);
+            if (cell) {
                 cell.classList.add('winner');
             }
         });
@@ -268,13 +336,20 @@ function resetGame() {
     gameState.board = ['', '', '', '', '', '', '', '', ''];
     gameState.currentPlayer = 'X';
     gameState.gameActive = true;
+    gameState.winningLine = null;
     
     updateBoard();
     updatePlayerCards();
     
+    winLine.className = 'win-line';
     document.querySelectorAll('.cell').forEach(cell => {
         cell.classList.remove('winner');
     });
+}
+
+function playAgain() {
+    resetGame();
+    winnerModal.style.display = 'none';
 }
 
 function updateBoard() {

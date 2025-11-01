@@ -192,12 +192,18 @@ body.dark-mode .player-card.o {
     font-weight: 600;
 }
 
+.board-container {
+    position: relative;
+    max-width: 400px;
+    margin: 0 auto;
+}
+
 .board {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 15px;
-    max-width: 400px;
-    margin: 0 auto;
+    position: relative;
+    z-index: 1;
 }
 
 .cell {
@@ -213,6 +219,8 @@ body.dark-mode .player-card.o {
     cursor: pointer;
     transition: all 0.3s ease;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    position: relative;
+    z-index: 2;
 }
 
 body.dark-mode .cell {
@@ -239,6 +247,32 @@ body.dark-mode .cell {
     background: #4caf50;
     color: white;
     border-color: #45a049;
+}
+
+.win-line {
+    position: absolute;
+    background: #ffeb3b;
+    height: 8px;
+    border-radius: 4px;
+    z-index: 3;
+    pointer-events: none;
+    opacity: 0;
+    transform-origin: center;
+    box-shadow: 0 0 10px rgba(255, 235, 59, 0.5);
+}
+
+.win-line.show {
+    opacity: 1;
+    animation: lineDraw 0.5s ease-out;
+}
+
+@keyframes lineDraw {
+    from {
+        transform: scaleX(0);
+    }
+    to {
+        transform: scaleX(1);
+    }
 }
 
 .sidebar {
