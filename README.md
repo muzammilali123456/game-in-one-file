@@ -1,5 +1,5 @@
 # Tic Tac Toe 
-A modern and visually polished version of the classic Tic Tac Toe game<br>built with HTML, CSS, and JavaScript. This isn’t the usual basic grid — it’s a feature-rich, interactive, and responsive game designed for both fun and learning. You can play against the computer (AI) or a friend (2-player mode), with smooth animations and sound effects that make the experience engaging.
+A modern and visually polished version of the classic Tic Tac Toe game<br>built with HTML, CSS, and JavaScript. This isn’t the usual basic grid it’s a feature-rich, interactive, and responsive game designed for both fun and learning. You can play against the computer (AI) or a friend (2-player mode), with smooth animations and sound effects that make the experience engaging.
 
 🚀 Features
 
