@@ -196,6 +196,7 @@ body.dark-mode .player-card.o {
     position: relative;
     max-width: 400px;
     margin: 0 auto;
+    height: 400px;
 }
 
 .board {
@@ -204,6 +205,7 @@ body.dark-mode .player-card.o {
     gap: 15px;
     position: relative;
     z-index: 1;
+    height: 100%;
 }
 
 .cell {
@@ -247,23 +249,50 @@ body.dark-mode .cell {
     background: #4caf50;
     color: white;
     border-color: #45a049;
+    animation: pulse 0.6s ease-in-out;
 }
 
 .win-line {
     position: absolute;
     background: #ffeb3b;
-    height: 8px;
     border-radius: 4px;
     z-index: 3;
     pointer-events: none;
     opacity: 0;
     transform-origin: center;
-    box-shadow: 0 0 10px rgba(255, 235, 59, 0.5);
+    box-shadow: 0 0 15px rgba(255, 235, 59, 0.7);
+    transition: opacity 0.3s ease;
 }
 
 .win-line.show {
     opacity: 1;
-    animation: lineDraw 0.5s ease-out;
+    animation: lineDraw 0.6s ease-out;
+}
+
+.win-line.horizontal {
+    height: 8px;
+    width: 100%;
+}
+
+.win-line.vertical {
+    width: 8px;
+    height: 100%;
+}
+
+.win-line.diagonal-1 {
+    height: 8px;
+    width: 141%;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) rotate(45deg);
+}
+
+.win-line.diagonal-2 {
+    height: 8px;
+    width: 141%;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) rotate(-45deg);
 }
 
 @keyframes lineDraw {
@@ -273,6 +302,12 @@ body.dark-mode .cell {
     to {
         transform: scaleX(1);
     }
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); }
 }
 
 .sidebar {
@@ -536,16 +571,6 @@ body.dark-mode .player-input input {
 .start-game-btn {
     font-size: 1.2rem;
     padding: 15px 40px;
-}
-
-@keyframes pulse {
-    0% { transform: scale(1); }
-    50% { transform: scale(1.1); }
-    100% { transform: scale(1); }
-}
-
-.pulse {
-    animation: pulse 2s infinite;
 }
 
 @keyframes bounce {

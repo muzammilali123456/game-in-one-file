@@ -231,8 +231,8 @@ function checkWinner() {
         { pattern: [0, 3, 6], type: 'vertical', position: 'left' },
         { pattern: [1, 4, 7], type: 'vertical', position: 'center' },
         { pattern: [2, 5, 8], type: 'vertical', position: 'right' },
-        { pattern: [0, 4, 8], type: 'diagonal', position: 'top-left' },
-        { pattern: [2, 4, 6], type: 'diagonal', position: 'top-right' }
+        { pattern: [0, 4, 8], type: 'diagonal', position: 'diagonal-1' },
+        { pattern: [2, 4, 6], type: 'diagonal', position: 'diagonal-2' }
     ];
 
     for (const winPattern of winPatterns) {
@@ -250,51 +250,33 @@ function checkWinner() {
 }
 
 function drawWinningLine(line) {
-    const boardRect = gameBoard.getBoundingClientRect();
-    const cellSize = boardRect.width / 3;
-    const gap = 15;
-    
-    winLine.className = 'win-line show';
+    winLine.className = 'win-line';
     
     switch (line.type) {
         case 'horizontal':
-            const horizontalPositions = {
-                'top': cellSize / 2,
-                'middle': cellSize * 1.5,
-                'bottom': cellSize * 2.5
-            };
-            winLine.style.width = `${boardRect.width - gap}px`;
-            winLine.style.height = '8px';
-            winLine.style.top = `${horizontalPositions[line.position] - 4}px`;
-            winLine.style.left = `${gap / 2}px`;
+            winLine.classList.add('horizontal', 'show');
+            if (line.position === 'top') {
+                winLine.style.top = '16.66%';
+            } else if (line.position === 'middle') {
+                winLine.style.top = '50%';
+            } else {
+                winLine.style.top = '83.33%';
+            }
             break;
             
         case 'vertical':
-            const verticalPositions = {
-                'left': cellSize / 2,
-                'center': cellSize * 1.5,
-                'right': cellSize * 2.5
-            };
-            winLine.style.width = '8px';
-            winLine.style.height = `${boardRect.height - gap}px`;
-            winLine.style.left = `${verticalPositions[line.position] - 4}px`;
-            winLine.style.top = `${gap / 2}px`;
+            winLine.classList.add('vertical', 'show');
+            if (line.position === 'left') {
+                winLine.style.left = '16.66%';
+            } else if (line.position === 'center') {
+                winLine.style.left = '50%';
+            } else {
+                winLine.style.left = '83.33%';
+            }
             break;
             
         case 'diagonal':
-            if (line.position === 'top-left') {
-                winLine.style.width = `${Math.sqrt(2) * (boardRect.width - gap)}px`;
-                winLine.style.height = '8px';
-                winLine.style.top = `${boardRect.height / 2 - 4}px`;
-                winLine.style.left = `${gap / 2}px`;
-                winLine.style.transform = 'rotate(45deg)';
-            } else {
-                winLine.style.width = `${Math.sqrt(2) * (boardRect.width - gap)}px`;
-                winLine.style.height = '8px';
-                winLine.style.top = `${boardRect.height / 2 - 4}px`;
-                winLine.style.right = `${gap / 2}px`;
-                winLine.style.transform = 'rotate(-45deg)';
-            }
+            winLine.classList.add(line.position, 'show');
             break;
     }
 }
@@ -312,8 +294,10 @@ function endGame(winner, winningLine) {
         showWinnerModal(`${winnerName} Wins!`, winner === 'X' ? '❌' : '⭕', `Congratulations ${winnerName}!`);
         
         if (winningLine) {
-            drawWinningLine(winningLine);
-            highlightWinningCells(winningLine.pattern);
+            setTimeout(() => {
+                drawWinningLine(winningLine);
+                highlightWinningCells(winningLine.pattern);
+            }, 100);
         }
     }
     
@@ -322,14 +306,12 @@ function endGame(winner, winningLine) {
 }
 
 function highlightWinningCells(winningPattern) {
-    setTimeout(() => {
-        winningPattern.forEach(index => {
-            const cell = document.querySelector(`.cell[data-index="${index}"]`);
-            if (cell) {
-                cell.classList.add('winner');
-            }
-        });
-    }, 100);
+    winningPattern.forEach(index => {
+        const cell = document.querySelector(`.cell[data-index="${index}"]`);
+        if (cell) {
+            cell.classList.add('winner');
+        }
+    });
 }
 
 function resetGame() {
@@ -350,6 +332,11 @@ function resetGame() {
 function playAgain() {
     resetGame();
     winnerModal.style.display = 'none';
+}
+
+function backToLobby() {
+    winnerModal.style.display = 'none';
+    showLobby();
 }
 
 function updateBoard() {
