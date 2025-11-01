@@ -1,2 +1,2 @@
-# game using html css js and python
+# Tic Tac Toe 
 this game is in one file with full backend and frontend code
